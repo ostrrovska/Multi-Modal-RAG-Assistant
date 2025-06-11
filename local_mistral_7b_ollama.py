@@ -12,6 +12,7 @@ from llama_index.core.ingestion import IngestionPipeline
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.llms.ollama import Ollama
 from llama_index.vector_stores.chroma import ChromaVectorStore
+from hf_BLIP import image_to_document
 
 # Initialize FREE LOCAL components
 embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
@@ -21,6 +22,14 @@ llm = Ollama(model="mistral:7b-instruct-v0.2-q4_K_M", request_timeout=400.0)
 logging.basicConfig(filename='ocr_debug.log', level=logging.INFO,
                     format='%(asctime)s - %(message)s')
 
+def generate_image_caption(image_path: str) -> Document:
+    """Generate caption for image using BLIP model"""
+    try:
+        caption = image_to_document(image_path)
+        return caption
+    except Exception as e:
+        logging.error(f"IMAGE CAPTION GENERATION FAILED: {image_path} - {str(e)}")
+        return ""
 
 def extract_pdf_text(file_path: str) -> List[Document]:
     """Extract text from PDF including metadata using PyMuPDF"""
@@ -97,6 +106,9 @@ def load_documents(data_dir: str) -> List[Document]:
         # Image files
         elif file_extension in ['.png', '.jpg', '.jpeg']:
             documents.extend(ocr_image_to_text(str(file_path)))
+            caption_doc = generate_image_caption(str(file_path))
+            if caption_doc:
+                documents.append(caption_doc)
 
         # Text and markdown files
         elif file_extension in ['.txt', '.md']:
@@ -195,9 +207,14 @@ def main():
     #print(f"Response: {pdf_response}")
 
     # Text query
-    text_response = query_engine.query("Who is Anaximenes?")
-    print(f"\nText Query - Who is Anaximenes?")
-    print(f"Response: {text_response}")
+    #text_response = query_engine.query("Anaximenes's philosophy was centered on which theory?")
+    #print(f"\nText Query - Anaximenes's philosophy was centered on which theory?")
+    #print(f"Response: {text_response}")
+
+    # Image query
+    img_response = query_engine.query("What is the caption of the image2.jpg?")
+    print(f"\nImage Query - What is the caption of the image2.jpg?")
+    print(f"Response: {img_response}")
 
 
 if __name__ == "__main__":
