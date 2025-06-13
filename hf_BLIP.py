@@ -5,6 +5,8 @@ from llama_index.core import Document
 from PIL import Image
 from transformers import BlipProcessor, BlipForConditionalGeneration
 import torch
+from typing import List
+
 
 
 # ===== GLOBAL MODEL LOAD (Load once, use everywhere) =====
@@ -20,9 +22,7 @@ def load_blip_model():
         blip_processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
         blip_model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base").to(device)
 
-
-# ===== IMAGE TO DOCUMENT FUNCTION =====
-def image_to_document(image_path: str) -> Document:
+def image_to_document(image_path: str) -> List[Document]:
     """Process image to Document with caption"""
     try:
         img = Image.open(image_path).convert('RGB')
@@ -33,17 +33,17 @@ def image_to_document(image_path: str) -> Document:
         caption = blip_model.generate(**inputs, max_new_tokens=100)[0]
         caption_text = blip_processor.decode(caption, skip_special_tokens=True)
 
-        return Document(
+        return [Document(
             text=f"Caption: {caption_text}",
             metadata={
                 "file_path": image_path,
                 "file_type": "IMAGE",
                 "caption": caption_text
             }
-        )
+        )]
     except Exception as e:
         logging.error(f"IMAGE PROCESSING FAILED: {image_path} - {str(e)}")
-        return Document(text="", metadata={"file_path": image_path, "error": str(e)})
+        return []
 
 
 # ===== TEST CAPTION GENERATION =====
@@ -61,4 +61,4 @@ def test_caption_generation():
         print(f"Caption: {doc.metadata['caption']}")
 
 # Call test in main() or separately
-test_caption_generation()
+#test_caption_generation()
