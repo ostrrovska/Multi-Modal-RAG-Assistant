@@ -107,36 +107,37 @@ def load_documents(data_dir: str) -> List[Document]:
     documents = []
     data_path = Path(data_dir)
 
-    # Process all files in directory
-    for file_path in data_path.glob('*'):
-        file_extension = file_path.suffix.lower()
+    # Process all files in directory and subdirectories
+    for file_path in data_path.rglob('*'):
+        if file_path.is_file():  # Only process files, not directories
+            file_extension = file_path.suffix.lower()
 
-        # PDF files
-        if file_extension == '.pdf':
-            documents.extend(extract_pdf_text(str(file_path)))
+            # PDF files
+            if file_extension == '.pdf':
+                documents.extend(extract_pdf_text(str(file_path)))
 
-        # Image files
-        elif file_extension in ['.png', '.jpg', '.jpeg']:
-            caption_docs = generate_image_caption(str(file_path))
-            ocr_docs = generate_image_text_ocr(str(file_path))
-            documents.extend(process_image(caption_docs, ocr_docs))
+            # Image files
+            elif file_extension in ['.png', '.jpg', '.jpeg']:
+                caption_docs = generate_image_caption(str(file_path))
+                ocr_docs = generate_image_text_ocr(str(file_path))
+                documents.extend(process_image(caption_docs, ocr_docs))
 
-        elif file_extension in ['.txt', '.md']:
-            try:
-                with open(file_path, 'r', encoding='utf-8') as f:
-                    text = f.read()
-                doc = Document(
-                    text=text,
-                    metadata={
-                        "file_path": str(file_path),
-                        "file_type": "TEXT",
-                        "extension": file_extension
-                    }
-                )
-                documents.append(doc)
-                logging.info(f"TEXT FILE LOADED: {file_path}, extracted text: {text[:200]}...")
-            except Exception as e:
-                logging.error(f"TEXT LOADING FAILED: {file_path} - {str(e)}")
+            elif file_extension in ['.txt', '.md']:
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        text = f.read()
+                    doc = Document(
+                        text=text,
+                        metadata={
+                            "file_path": str(file_path),
+                            "file_type": "TEXT",
+                            "extension": file_extension
+                        }
+                    )
+                    documents.append(doc)
+                    logging.info(f"TEXT FILE LOADED: {file_path}, extracted text: {text[:200]}...")
+                except Exception as e:
+                    logging.error(f"TEXT LOADING FAILED: {file_path} - {str(e)}")
 
     return documents
 
