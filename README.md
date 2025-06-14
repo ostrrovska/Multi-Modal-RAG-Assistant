@@ -34,7 +34,7 @@ A powerful Retrieval-Augmented Generation (RAG) system that can process and quer
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/Multi-Modal-RAG-Assistant.git
+git clone git@github.com:ostrrovska/Multi-Modal-RAG-Assistant.git
 cd Multi-Modal-RAG-Assistant
 ```
 
