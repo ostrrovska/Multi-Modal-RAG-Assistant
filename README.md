@@ -73,7 +73,7 @@ python rag_ui.py
 ```
 
 2. Using the GUI:
-   - Click "Browse" to select a directory containing your documents
+   - Click "Browse" to select a directory containing your documents. You can use the included `data/` directory in the project as an example, which contains sample text files, PDFs, and images for testing.
    - Click "Process Documents" to start the ingestion pipeline
    - Wait for the processing to complete
    - Enter your query in the query section
@@ -90,7 +90,10 @@ python rag_ui.py
 - `main.py`: Core RAG pipeline implementation
 - `hf_BLIP.py`: Image captioning using BLIP model
 - `pytesseract_OCR.py`: OCR text extraction from images
-- `data/`: Directory for storing documents
+- `data/`: Directory containing example documents for testing:
+  - Sample text files with philosophical content
+  - Example PDF
+  - Test images for OCR and captioning
 - `data_chroma_db/`: Vector store database
 
 ## Configuration
